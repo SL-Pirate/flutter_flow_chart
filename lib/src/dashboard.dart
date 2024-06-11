@@ -447,8 +447,8 @@ class Dashboard extends ChangeNotifier {
       ),
     );
     d.dashboardSize = Size(
-      map['dashboardSizeWidth'] as double? ?? 0,
-      map['dashboardSizeHeight'] as double? ?? 0,
+      map['dashboardSizeWidth']?.toDouble() ?? 0,
+      map['dashboardSizeHeight']?.toDouble() ?? 0,
     );
 
     if (map['gridBackgroundParams'] != null) {
