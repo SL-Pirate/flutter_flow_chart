@@ -24,11 +24,12 @@ class ArrowParams extends ChangeNotifier {
     this.headRadius = 6,
     double tailLength = 25.0,
     this.color = Colors.black,
-    this.style,
+    ArrowStyle? style,
     this.tension = 1.0,
     this.startArrowPosition = Alignment.centerRight,
     this.endArrowPosition = Alignment.centerLeft,
-  }) : _tailLength = tailLength;
+  })  : _tailLength = tailLength,
+        style = style ?? ArrowStyle.curve;
 
   ///
   factory ArrowParams.fromMap(Map<String, dynamic> map) {
@@ -73,7 +74,7 @@ class ArrowParams extends ChangeNotifier {
   double _tailLength;
 
   /// The style of the arrow.
-  ArrowStyle? style;
+  ArrowStyle style;
 
   /// The curve tension for pivot points when using [ArrowStyle.segmented].
   /// 0 means no curve on segments.
@@ -105,7 +106,7 @@ class ArrowParams extends ChangeNotifier {
       'headRadius': headRadius,
       'tailLength': _tailLength,
       'color': color.value,
-      'style': style?.index,
+      'style': style.index,
       'tension': tension,
       'startArrowPositionX': startArrowPosition.x,
       'startArrowPositionY': startArrowPosition.y,
