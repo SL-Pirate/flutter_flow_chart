@@ -25,7 +25,7 @@ class FlowElement extends ChangeNotifier {
   String id;
 
   /// The position of the [FlowElement]
-  Offset position;
+  Offset _position;
 
   /// The size of the [FlowElement]
   Size size;
@@ -97,11 +97,18 @@ class FlowElement extends ChangeNotifier {
         id = const Uuid().v4(),
         isResizing = false,
         // fixing offset issue under extreme scaling
-        position = position -
+        _position = position -
             Offset(
               size.width / 2 + handlerSize / 2,
               size.height / 2 + handlerSize / 2,
             );
+
+  set position(Offset position) {
+    _position = position;
+    notifyListeners();
+  }
+
+  Offset get position => _position;
 
   @override
   String toString() {
