@@ -191,7 +191,6 @@ class _GridBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_GridBackgroundPainter oldDelegate) {
-    debugPrint('shouldRepaint ${oldDelegate.dx} $dx ${oldDelegate.dy} $dy');
     return oldDelegate.dx != dx || oldDelegate.dy != dy;
   }
 }

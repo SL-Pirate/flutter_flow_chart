@@ -152,7 +152,6 @@ class _FlowChartState extends State<FlowChart> {
   @override
   void initState() {
     super.initState();
-    widget.dashboard.addListener(_elementChanged);
     if (widget.onScaleUpdate != null) {
       widget.dashboard.gridBackgroundParams.addOnScaleUpdateListener(
         widget.onScaleUpdate!,
@@ -165,7 +164,6 @@ class _FlowChartState extends State<FlowChart> {
 
   @override
   void dispose() {
-    widget.dashboard.removeListener(_elementChanged);
     if (widget.onScaleUpdate != null) {
       widget.dashboard.gridBackgroundParams.removeOnScaleUpdateListener(
         widget.onScaleUpdate!,
@@ -202,183 +200,196 @@ class _FlowChartState extends State<FlowChart> {
     Offset tapDownPos = Offset.zero;
     Offset secondaryTapDownPos = Offset.zero;
     return ClipRect(
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Draw the grid
-          Positioned.fill(
-            child: GestureDetector(
-              onTapDown: (details) {
-                tapDownPos = details.localPosition;
-              },
-              onSecondaryTapDown: (details) {
-                secondaryTapDownPos = details.localPosition;
-              },
-              onTap: widget.onDashboardTapped == null
-                  ? null
-                  : () => widget.onDashboardTapped!(
-                        gridKey.currentContext!,
-                        tapDownPos,
-                      ),
-              onLongPress: widget.onDashboardLongTapped == null
-                  ? null
-                  : () => widget.onDashboardLongTapped!(
-                        gridKey.currentContext!,
-                        tapDownPos,
-                      ),
-              onSecondaryTap: () {
-                if (widget.onDashboardSecondaryTapped != null) {
-                  widget.onDashboardSecondaryTapped!(
-                    gridKey.currentContext!,
-                    secondaryTapDownPos,
-                  );
-                }
-              },
-              onSecondaryLongPress: () {
-                if (widget.onDashboardSecondaryLongTapped != null) {
-                  widget.onDashboardSecondaryLongTapped!(
-                    gridKey.currentContext!,
-                    secondaryTapDownPos,
-                  );
-                }
-              },
-              onScaleUpdate: (details) {
-                if (details.scale != 1) {
-                  widget.dashboard.setZoomFactor(
-                    details.scale + _oldScaleUpdateDelta,
-                    focalPoint: details.focalPoint,
-                  );
-                }
-
-                widget.dashboard.setDashboardPosition(
-                  widget.dashboard.position + details.focalPointDelta,
-                );
-                for (int i = 0; i < widget.dashboard.elements.length; i++) {
-                  widget.dashboard.elements[i].position +=
-                      details.focalPointDelta;
-                  for (final conn in widget.dashboard.elements[i].next) {
-                    for (final pivot in conn.pivots) {
-                      pivot.pivot += details.focalPointDelta;
-                    }
-                  }
-                }
-
-                widget.dashboard.gridBackgroundParams.offset =
-                    details.focalPointDelta;
-                setState(() {});
-              },
-              onScaleEnd: (details) {
-                _oldScaleUpdateDelta = widget.dashboard.zoomFactor - 1;
-              },
-              child: GridBackground(
-                key: gridKey,
-                params: widget.dashboard.gridBackgroundParams,
-              ),
-            ),
-          ),
-          // Draw elements
-          for (int i = 0; i < widget.dashboard.elements.length; i++)
-            ElementWidget(
-              key: UniqueKey(),
-              dashboard: widget.dashboard,
-              element: widget.dashboard.elements.elementAt(i),
-              onElementPressed: widget.onElementPressed == null
-                  ? null
-                  : (context, position) => widget.onElementPressed!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
-              onElementSecondaryTapped: widget.onElementSecondaryTapped == null
-                  ? null
-                  : (context, position) => widget.onElementSecondaryTapped!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
-              onElementLongPressed: widget.onElementLongPressed == null
-                  ? null
-                  : (context, position) => widget.onElementLongPressed!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
-              onElementSecondaryLongTapped:
-                  widget.onElementSecondaryLongTapped == null
+      child: ListenableBuilder(
+        listenable: widget.dashboard,
+        builder: (context, _) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Draw the grid
+              Positioned.fill(
+                child: GestureDetector(
+                  onTapDown: (details) {
+                    tapDownPos = details.localPosition;
+                  },
+                  onSecondaryTapDown: (details) {
+                    secondaryTapDownPos = details.localPosition;
+                  },
+                  onTap: widget.onDashboardTapped == null
                       ? null
-                      : (context, position) =>
-                          widget.onElementSecondaryLongTapped!(
+                      : () => widget.onDashboardTapped!(
+                            gridKey.currentContext!,
+                            tapDownPos,
+                          ),
+                  onLongPress: widget.onDashboardLongTapped == null
+                      ? null
+                      : () => widget.onDashboardLongTapped!(
+                            gridKey.currentContext!,
+                            tapDownPos,
+                          ),
+                  onSecondaryTap: () {
+                    if (widget.onDashboardSecondaryTapped != null) {
+                      widget.onDashboardSecondaryTapped!(
+                        gridKey.currentContext!,
+                        secondaryTapDownPos,
+                      );
+                    }
+                  },
+                  onSecondaryLongPress: () {
+                    if (widget.onDashboardSecondaryLongTapped != null) {
+                      widget.onDashboardSecondaryLongTapped!(
+                        gridKey.currentContext!,
+                        secondaryTapDownPos,
+                      );
+                    }
+                  },
+                  onScaleUpdate: (details) {
+                    if (details.scale != 1) {
+                      widget.dashboard.setZoomFactor(
+                        details.scale + _oldScaleUpdateDelta,
+                        focalPoint: details.focalPoint,
+                      );
+                    }
+
+                    widget.dashboard.setDashboardPosition(
+                      widget.dashboard.position + details.focalPointDelta,
+                    );
+                    for (int i = 0; i < widget.dashboard.elements.length; i++) {
+                      widget.dashboard.elements[i].position +=
+                          details.focalPointDelta;
+                      for (final conn in widget.dashboard.elements[i].next) {
+                        for (final pivot in conn.pivots) {
+                          pivot.pivot += details.focalPointDelta;
+                        }
+                      }
+                    }
+
+                    widget.dashboard.gridBackgroundParams.offset =
+                        details.focalPointDelta;
+                    setState(() {});
+                  },
+                  onScaleEnd: (details) {
+                    _oldScaleUpdateDelta = widget.dashboard.zoomFactor - 1;
+                  },
+                  child: GridBackground(
+                    key: gridKey,
+                    params: widget.dashboard.gridBackgroundParams,
+                  ),
+                ),
+              ),
+              // Draw elements
+              for (int i = 0; i < widget.dashboard.elements.length; i++)
+                ElementWidget(
+                  key: UniqueKey(),
+                  dashboard: widget.dashboard,
+                  element: widget.dashboard.elements.elementAt(i),
+                  onElementPressed: widget.onElementPressed == null
+                      ? null
+                      : (context, position) => widget.onElementPressed!(
                             context,
                             position,
                             widget.dashboard.elements.elementAt(i),
                           ),
-              onHandlerPressed: widget.onHandlerPressed == null
-                  ? null
-                  : (context, position, handler, element) => widget
-                      .onHandlerPressed!(context, position, handler, element),
-              onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped == null
-                  ? null
-                  : (context, position, handler, element) =>
-                      widget.onHandlerSecondaryTapped!(
-                        context,
-                        position,
-                        handler,
-                        element,
-                      ),
-              onHandlerLongPressed: widget.onHandlerLongPressed == null
-                  ? null
-                  : (context, position, handler, element) =>
-                      widget.onHandlerLongPressed!(
-                        context,
-                        position,
-                        handler,
-                        element,
-                      ),
-              onHandlerSecondaryLongTapped:
-                  widget.onHandlerSecondaryLongTapped == null
+                  onElementSecondaryTapped: widget.onElementSecondaryTapped ==
+                          null
+                      ? null
+                      : (context, position) => widget.onElementSecondaryTapped!(
+                            context,
+                            position,
+                            widget.dashboard.elements.elementAt(i),
+                          ),
+                  onElementLongPressed: widget.onElementLongPressed == null
+                      ? null
+                      : (context, position) => widget.onElementLongPressed!(
+                            context,
+                            position,
+                            widget.dashboard.elements.elementAt(i),
+                          ),
+                  onElementSecondaryLongTapped:
+                      widget.onElementSecondaryLongTapped == null
+                          ? null
+                          : (context, position) =>
+                              widget.onElementSecondaryLongTapped!(
+                                context,
+                                position,
+                                widget.dashboard.elements.elementAt(i),
+                              ),
+                  onHandlerPressed: widget.onHandlerPressed == null
                       ? null
                       : (context, position, handler, element) =>
-                          widget.onHandlerSecondaryLongTapped!(
+                          widget.onHandlerPressed!(
+                              context, position, handler, element),
+                  onHandlerSecondaryTapped:
+                      widget.onHandlerSecondaryTapped == null
+                          ? null
+                          : (context, position, handler, element) =>
+                              widget.onHandlerSecondaryTapped!(
+                                context,
+                                position,
+                                handler,
+                                element,
+                              ),
+                  onHandlerLongPressed: widget.onHandlerLongPressed == null
+                      ? null
+                      : (context, position, handler, element) =>
+                          widget.onHandlerLongPressed!(
                             context,
                             position,
                             handler,
                             element,
                           ),
-            ),
-          // Draw arrows
-          for (int i = 0; i < widget.dashboard.elements.length; i++)
-            for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
-              DrawArrow(
-                key: UniqueKey(),
-                srcElement: widget.dashboard.elements[i],
-                destElement: widget
-                    .dashboard.elements[widget.dashboard.findElementIndexById(
-                  widget.dashboard.elements[i].next[n].destElementId,
-                )],
-                arrowParams: widget.dashboard.elements[i].next[n].arrowParams,
-                pivots: widget.dashboard.elements[i].next[n].pivots,
-                onTap: widget.onLineTapped,
-                onLongPress: widget.onLineLongPressed,
-                onSecondaryTap: widget.onLineSecondaryTapped,
-                onSecondaryLongPress: widget.onLineSecondaryLongTapped,
-              ),
-          if (widget.dashboard.defaultArrowStyle == ArrowStyle.segmented)
-            // drawing segment handlers
-            for (int i = 0; i < widget.dashboard.elements.length; i++)
-              for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
-                for (int j = 0;
-                    j < widget.dashboard.elements[i].next[n].pivots.length;
-                    j++)
-                  SegmentHandler(
+                  onHandlerSecondaryLongTapped:
+                      widget.onHandlerSecondaryLongTapped == null
+                          ? null
+                          : (context, position, handler, element) =>
+                              widget.onHandlerSecondaryLongTapped!(
+                                context,
+                                position,
+                                handler,
+                                element,
+                              ),
+                ),
+              // Draw arrows
+              for (int i = 0; i < widget.dashboard.elements.length; i++)
+                for (int n = 0;
+                    n < widget.dashboard.elements[i].next.length;
+                    n++)
+                  DrawArrow(
                     key: UniqueKey(),
-                    pivot: widget.dashboard.elements[i].next[n].pivots[j],
-                    dashboard: widget.dashboard,
-                    onPivotPressed: widget.onPivotPressed,
-                    onPivotSecondaryPressed: widget.onPivotSecondaryPressed,
+                    srcElement: widget.dashboard.elements[i],
+                    destElement: widget.dashboard
+                        .elements[widget.dashboard.findElementIndexById(
+                      widget.dashboard.elements[i].next[n].destElementId,
+                    )],
+                    arrowParams:
+                        widget.dashboard.elements[i].next[n].arrowParams,
+                    pivots: widget.dashboard.elements[i].next[n].pivots,
+                    onTap: widget.onLineTapped,
+                    onLongPress: widget.onLineLongPressed,
+                    onSecondaryTap: widget.onLineSecondaryTapped,
+                    onSecondaryLongPress: widget.onLineSecondaryLongTapped,
                   ),
-          // user drawing when connecting elements
-          DrawingArrowWidget(style: widget.dashboard.defaultArrowStyle),
-        ],
+              if (widget.dashboard.defaultArrowStyle == ArrowStyle.segmented)
+                // drawing segment handlers
+                for (int i = 0; i < widget.dashboard.elements.length; i++)
+                  for (int n = 0;
+                      n < widget.dashboard.elements[i].next.length;
+                      n++)
+                    for (int j = 0;
+                        j < widget.dashboard.elements[i].next[n].pivots.length;
+                        j++)
+                      SegmentHandler(
+                        key: UniqueKey(),
+                        pivot: widget.dashboard.elements[i].next[n].pivots[j],
+                        dashboard: widget.dashboard,
+                        onPivotPressed: widget.onPivotPressed,
+                        onPivotSecondaryPressed: widget.onPivotSecondaryPressed,
+                      ),
+              // user drawing when connecting elements
+              DrawingArrowWidget(style: widget.dashboard.defaultArrowStyle),
+            ],
+          );
+        },
       ),
     );
   }

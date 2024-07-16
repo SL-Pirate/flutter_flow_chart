@@ -321,8 +321,11 @@ class Dashboard extends ChangeNotifier {
     bool found = false;
     String elementId = element.id;
     elements.removeWhere((e) {
-      if (e.id == element.id) found = true;
-      return e.id == element.id;
+      if (e.id == element.id) {
+        found = true;
+      }
+
+      return found;
     });
 
     // remove all connections to the element
@@ -330,7 +333,9 @@ class Dashboard extends ChangeNotifier {
       e.next.removeWhere(
           (handlerParams) => handlerParams.destElementId == elementId);
     }
-    if (notify) notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return found;
   }
 
