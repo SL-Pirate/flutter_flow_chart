@@ -321,17 +321,30 @@ class Dashboard extends ChangeNotifier {
     bool found = false;
     String elementId = element.id;
     elements.removeWhere((e) {
-      if (e.id == element.id) {
+      if (e.id == elementId) {
         found = true;
+        return true;
       }
 
-      return found;
+      return false;
     });
 
     // remove all connections to the element
-    for (FlowElement e in elements) {
-      e.next.removeWhere(
-          (handlerParams) => handlerParams.destElementId == elementId);
+    if (found) {
+      for (FlowElement e in elements) {
+        bool foundConnection = false;
+        e.next.removeWhere(
+          (handlerParams) {
+            if (handlerParams.destElementId == elementId) {
+              foundConnection = true;
+              return true;
+            }
+            return false;
+          },
+        );
+
+        if (foundConnection) break;
+      }
     }
     if (notify) {
       notifyListeners();
