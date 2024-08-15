@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../dashboard.dart';
 import '../elements/flow_element.dart';
 import 'draw_arrow.dart';
@@ -141,7 +142,7 @@ class _ElementHandler extends StatelessWidget {
       child: DragTarget<Map>(
         onWillAcceptWithDetails: (details) {
           DrawingArrow.instance.setParams(
-            DrawingArrow.instance.params.copyWith(
+            DrawingArrow.instance.params?.copyWith(
               endArrowPosition: alignment,
               style: dashboard.defaultArrowStyle,
             ),
@@ -153,14 +154,15 @@ class _ElementHandler extends StatelessWidget {
           dashboard.addNextById(
             details.data['srcElement'],
             element.id,
-            DrawingArrow.instance.params.copyWith(
+            (DrawingArrow.instance.params ?? dashboard.defaultArrowParams)
+                .copyWith(
               endArrowPosition: alignment,
             ),
           );
         },
         onLeave: (data) {
           DrawingArrow.instance.setParams(
-            DrawingArrow.instance.params.copyWith(
+            DrawingArrow.instance.params?.copyWith(
               endArrowPosition: const Alignment(0.0, 0.0),
               style: dashboard.defaultArrowStyle,
             ),
@@ -213,9 +215,11 @@ class _ElementHandler extends StatelessWidget {
             ),
             onDragUpdate: (details) {
               if (!isDragging) {
-                DrawingArrow.instance.params = ArrowParams(
-                    startArrowPosition: alignment,
-                    endArrowPosition: const Alignment(0, 0));
+                DrawingArrow.instance.params =
+                    dashboard.defaultArrowParams.copyWith(
+                  startArrowPosition: alignment,
+                  endArrowPosition: const Alignment(0, 0),
+                );
                 DrawingArrow.instance.from =
                     details.globalPosition - dashboard.position;
                 isDragging = true;

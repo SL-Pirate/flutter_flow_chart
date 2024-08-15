@@ -138,10 +138,10 @@ class DrawingArrow extends ChangeNotifier {
   static final instance = DrawingArrow._();
 
   /// Arrow parameters.
-  ArrowParams params = ArrowParams();
+  ArrowParams? params;
 
   /// Sets the parameters.
-  void setParams(ArrowParams params) {
+  void setParams(ArrowParams? params) {
     this.params = params;
     notifyListeners();
   }
@@ -171,7 +171,7 @@ class DrawingArrow extends ChangeNotifier {
 
   ///
   void reset() {
-    params = ArrowParams();
+    params = null;
     from = Offset.zero;
     to = Offset.zero;
     notifyListeners();

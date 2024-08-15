@@ -172,10 +172,6 @@ class _FlowChartState extends State<FlowChart> {
     super.dispose();
   }
 
-  _elementChanged() {
-    if (mounted) setState(() {});
-  }
-
   double _oldScaleUpdateDelta = 0;
 
   @override
@@ -386,7 +382,10 @@ class _FlowChartState extends State<FlowChart> {
                         onPivotSecondaryPressed: widget.onPivotSecondaryPressed,
                       ),
               // user drawing when connecting elements
-              DrawingArrowWidget(style: widget.dashboard.defaultArrowStyle),
+              DrawingArrowWidget(
+                style: widget.dashboard.defaultArrowStyle,
+                params: widget.dashboard.defaultArrowParams,
+              ),
             ],
           );
         },
@@ -398,8 +397,13 @@ class _FlowChartState extends State<FlowChart> {
 /// Widget to draw interactive connection when the user tap on handlers
 class DrawingArrowWidget extends StatefulWidget {
   final ArrowStyle style;
+  final ArrowParams params;
 
-  const DrawingArrowWidget({super.key, required this.style});
+  const DrawingArrowWidget({
+    super.key,
+    required this.style,
+    required this.params,
+  });
 
   @override
   State<DrawingArrowWidget> createState() => _DrawingArrowWidgetState();
@@ -427,7 +431,7 @@ class _DrawingArrowWidgetState extends State<DrawingArrowWidget> {
     if (DrawingArrow.instance.isZero()) return const SizedBox.shrink();
     return CustomPaint(
       painter: ArrowPainter(
-        params: DrawingArrow.instance.params,
+        params: DrawingArrow.instance.params ?? widget.params,
         from: DrawingArrow.instance.from,
         to: DrawingArrow.instance.to,
       ),

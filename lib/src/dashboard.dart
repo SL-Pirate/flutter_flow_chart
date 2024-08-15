@@ -1,11 +1,12 @@
-import 'dart:io';
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
-import 'package:flutter/widgets.dart';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/ui/segment_handler.dart';
+import 'package:uuid/uuid.dart';
 
 typedef ConnectionListener = void Function(
   FlowElement srcElement,
@@ -34,6 +35,8 @@ class Dashboard extends ChangeNotifier {
   /// setting it to 0 will remove the limit
   double minimumZoomFactor;
 
+  final ArrowParams defaultArrowParams;
+
   final List<ConnectionListener> _connectionListeners = [];
 
   Dashboard({
@@ -41,7 +44,9 @@ class Dashboard extends ChangeNotifier {
     this.blockDefaultZoomGestures = false,
     this.minimumZoomFactor = 0.25,
     this.defaultArrowStyle = ArrowStyle.curve,
+    ArrowParams? defaultArrowParams,
   })  : elements = [],
+        defaultArrowParams = defaultArrowParams ?? ArrowParams(),
         _dashboardPosition = Offset.zero,
         dashboardSize = const Size(0, 0),
         gridBackgroundParams = GridBackgroundParams() {
@@ -453,12 +458,17 @@ class Dashboard extends ChangeNotifier {
       'blockDefaultZoomGestures': blockDefaultZoomGestures,
       'minimumZoomFactor': minimumZoomFactor,
       'arrowStyle': defaultArrowStyle.index,
+      'defaultArrowParams': defaultArrowParams.toMap(),
     };
   }
 
   factory Dashboard.fromMap(Map<String, dynamic> map) {
     Dashboard d = Dashboard(
-        defaultArrowStyle: ArrowStyle.values[map['arrowStyle'] as int? ?? 0]);
+      defaultArrowStyle: ArrowStyle.values[map['arrowStyle'] as int? ?? 0],
+      defaultArrowParams: ArrowParams.fromMap(
+        Map.from(map['defaultArrowParams'] as Map),
+      ),
+    );
     d.elements = List<FlowElement>.from(
       (map['elements'] as List<dynamic>).map<FlowElement>(
         (x) => FlowElement.fromMap(x as Map<String, dynamic>),
