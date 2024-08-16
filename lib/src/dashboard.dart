@@ -28,6 +28,7 @@ class Dashboard extends ChangeNotifier {
 
   GridBackgroundParams gridBackgroundParams;
   bool blockDefaultZoomGestures;
+  final ValueNotifier<bool> isDraggableNotifier = ValueNotifier(true);
 
   /// minimum zoom factor allowed
   /// default is 0.25
@@ -552,5 +553,10 @@ class Dashboard extends ChangeNotifier {
 
       recenter();
     }
+  }
+
+  bool get isDraggable => isDraggableNotifier.value;
+  void set isDraggable(bool value) {
+    isDraggableNotifier.value = value;
   }
 }

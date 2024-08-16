@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
-import 'package:flutter_flow_chart/src/ui/resize_widget.dart';
-import 'package:flutter_flow_chart/src/objects/oval_widget.dart';
-import 'package:flutter_flow_chart/src/ui/element_handlers.dart';
 import 'package:flutter_flow_chart/src/objects/diamond_widget.dart';
-import 'package:flutter_flow_chart/src/objects/storage_widget.dart';
 import 'package:flutter_flow_chart/src/objects/hexagon_widget.dart';
-import 'package:flutter_flow_chart/src/objects/rectangle_widget.dart';
+import 'package:flutter_flow_chart/src/objects/oval_widget.dart';
 import 'package:flutter_flow_chart/src/objects/parallelogram_widget.dart';
+import 'package:flutter_flow_chart/src/objects/rectangle_widget.dart';
+import 'package:flutter_flow_chart/src/objects/storage_widget.dart';
+import 'package:flutter_flow_chart/src/ui/element_handlers.dart';
+import 'package:flutter_flow_chart/src/ui/resize_widget.dart';
 
 /// Widget that use [element] properties to display it on the dashboard scene
 class ElementWidget extends StatefulWidget {
@@ -43,6 +43,8 @@ class ElementWidget extends StatefulWidget {
     Handler handler,
     FlowElement element,
   )? onHandlerSecondaryLongTapped;
+  final void Function(BuildContext context, String elementId, Offset position)?
+      onElementMoved;
 
   const ElementWidget({
     super.key,
@@ -55,7 +57,7 @@ class ElementWidget extends StatefulWidget {
     this.onHandlerPressed,
     this.onHandlerSecondaryTapped,
     this.onHandlerLongPressed,
-    this.onHandlerSecondaryLongTapped,
+    this.onHandlerSecondaryLongTapped, this.onElementMoved,
   });
 
   @override
@@ -157,32 +159,63 @@ class _ElementWidgetState extends State<ElementWidget> {
           onPointerDown: (event) {
             delta = event.localPosition;
           },
-          child: Draggable<FlowElement>(
-            data: widget.element,
-            dragAnchorStrategy: childDragAnchorStrategy,
-            childWhenDragging: const SizedBox.shrink(),
-            feedback: Material(
-              color: Colors.transparent,
-              child: element,
-            ),
-            child: ElementHandlers(
-              dashboard: widget.dashboard,
-              element: widget.element,
-              handlerSize: widget.element.handlerSize,
-              onHandlerPressed: widget.onHandlerPressed,
-              onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped,
-              onHandlerLongPressed: widget.onHandlerLongPressed,
-              onHandlerSecondaryLongTapped: widget.onHandlerSecondaryLongTapped,
-              child: element,
-            ),
-            onDragUpdate: (details) {
-              widget.element.changePosition(
-                details.globalPosition - widget.dashboard.position - delta,
+          child: ValueListenableBuilder(
+            valueListenable: widget.dashboard.isDraggableNotifier,
+            builder: (context, isDraggable, _) {
+              if (isDraggable == false) {
+                return ElementHandlers(
+                  dashboard: widget.dashboard,
+                  element: widget.element,
+                  handlerSize: widget.element.handlerSize,
+                  onHandlerPressed: widget.onHandlerPressed,
+                  onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped,
+                  onHandlerLongPressed: widget.onHandlerLongPressed,
+                  onHandlerSecondaryLongTapped:
+                      widget.onHandlerSecondaryLongTapped,
+                  child: element,
+                );
+              }
+
+              return Draggable<FlowElement>(
+                data: widget.element,
+                dragAnchorStrategy: childDragAnchorStrategy,
+                childWhenDragging: const SizedBox.shrink(),
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: element,
+                ),
+                child: ElementHandlers(
+                  dashboard: widget.dashboard,
+                  element: widget.element,
+                  handlerSize: widget.element.handlerSize,
+                  onHandlerPressed: widget.onHandlerPressed,
+                  onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped,
+                  onHandlerLongPressed: widget.onHandlerLongPressed,
+                  onHandlerSecondaryLongTapped:
+                      widget.onHandlerSecondaryLongTapped,
+                  child: element,
+                ),
+                onDragUpdate: (details) {
+                  widget.element.changePosition(
+                    details.globalPosition - widget.dashboard.position - delta,
+                  );
+                  widget.onElementMoved?.call(
+                    context,
+                    widget.element.id,
+                    details.globalPosition - widget.dashboard.position - delta,
+                  );
+                },
+                onDragEnd: (details) {
+                  widget.element.changePosition(
+                    details.offset - widget.dashboard.position,
+                  );
+                  widget.onElementMoved?.call(
+                    context,
+                    widget.element.id,
+                    details.offset - widget.dashboard.position,
+                  );
+                },
               );
-            },
-            onDragEnd: (details) {
-              widget.element
-                  .changePosition(details.offset - widget.dashboard.position);
             },
           ),
         ),

@@ -1,12 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_flow_chart/src/dashboard.dart';
+import 'package:flutter_flow_chart/src/elements/flow_element.dart';
 import 'package:flutter_flow_chart/src/ui/draw_arrow.dart';
 import 'package:flutter_flow_chart/src/ui/element_widget.dart';
 import 'package:flutter_flow_chart/src/ui/grid_background.dart';
 import 'package:flutter_flow_chart/src/ui/segment_handler.dart';
-import 'package:flutter_flow_chart/src/elements/flow_element.dart';
 
 /// Main flow chart Widget.
 /// It displays the background grid, all the elements and connection lines
@@ -46,6 +46,10 @@ class FlowChart extends StatefulWidget {
 
   /// callback for secondary press event of pivot
   final Function(BuildContext context, Pivot pivot)? onPivotSecondaryPressed;
+
+  /// callback for when an element is moved
+  final void Function(BuildContext context, String elementId, Offset position)?
+      onElementMoved;
 
   /// callback for handler pressed
   final Function(
@@ -135,6 +139,7 @@ class FlowChart extends StatefulWidget {
     this.onHandlerSecondaryLongTapped,
     this.onPivotPressed,
     this.onPivotSecondaryPressed,
+    this.onElementMoved,
     @Deprecated('') this.onLineTapped,
     @Deprecated('') this.onLineLongPressed,
     @Deprecated('') this.onLineSecondaryTapped,
@@ -344,6 +349,7 @@ class _FlowChartState extends State<FlowChart> {
                                 handler,
                                 element,
                               ),
+                  onElementMoved: widget.onElementMoved,
                 ),
               // Draw arrows
               for (int i = 0; i < widget.dashboard.elements.length; i++)
