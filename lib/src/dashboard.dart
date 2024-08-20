@@ -466,9 +466,9 @@ class Dashboard extends ChangeNotifier {
   factory Dashboard.fromMap(Map<String, dynamic> map) {
     Dashboard d = Dashboard(
       defaultArrowStyle: ArrowStyle.values[map['arrowStyle'] as int? ?? 0],
-      defaultArrowParams: ArrowParams.fromMap(
-        Map.from(map['defaultArrowParams'] as Map),
-      ),
+      defaultArrowParams: map['defaultArrowParams'] is Map
+          ? ArrowParams.fromMap(map['defaultArrowParams'])
+          : null,
     );
     d.elements = List<FlowElement>.from(
       (map['elements'] as List<dynamic>).map<FlowElement>(
@@ -556,6 +556,7 @@ class Dashboard extends ChangeNotifier {
   }
 
   bool get isDraggable => isDraggableNotifier.value;
+
   void set isDraggable(bool value) {
     isDraggableNotifier.value = value;
   }
