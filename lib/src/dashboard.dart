@@ -557,7 +557,7 @@ class Dashboard extends ChangeNotifier {
 
   bool get isDraggable => isDraggableNotifier.value;
 
-  void set isDraggable(bool value) {
+  set isDraggable(bool value) {
     isDraggableNotifier.value = value;
   }
 }
