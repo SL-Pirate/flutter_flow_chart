@@ -506,6 +506,8 @@ class ArrowPainter extends CustomPainter {
 
   @override
   bool? hitTest(Offset position) {
+    return false;
+
     if (path.contains(position)) {
       return true;
     }
