@@ -83,6 +83,7 @@ class ArrowParams extends ChangeNotifier {
   ///
   ArrowParams copyWith({
     double? thickness,
+    double? headRadius,
     Color? color,
     ArrowStyle? style,
     double? tension,
@@ -93,6 +94,7 @@ class ArrowParams extends ChangeNotifier {
       thickness: thickness ?? this.thickness,
       color: color ?? this.color,
       style: style ?? this.style,
+      headRadius: headRadius ?? this.headRadius,
       tension: tension ?? this.tension,
       startArrowPosition: startArrowPosition ?? this.startArrowPosition,
       endArrowPosition: endArrowPosition ?? this.endArrowPosition,
