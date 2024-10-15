@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -506,8 +507,21 @@ class Dashboard extends ChangeNotifier {
   void recenter() {
     Offset center = Offset(dashboardSize.width / 2, dashboardSize.height / 2);
     gridBackgroundParams.offset = center;
+    var minX = double.infinity;
+    var maxX = 0.0;
+    var minY = double.infinity;
+    var maxY = 0.0;
+
+    for (final element in elements) {
+      minX = min(minX, element.position.dx + element.size.height);
+      minY = min(minY, element.position.dy);
+      maxX = max(maxX, element.position.dx);
+      maxY = max(maxY, element.position.dy + element.size.height);
+    }
+
     if (elements.isNotEmpty) {
-      Offset currentDeviation = elements.first.position - center;
+      Offset currentDeviation =
+          Offset((maxX + minX) / 2, (maxY + minY) / 2) - center;
       for (FlowElement element in elements) {
         element.position -= currentDeviation;
         for (final next in element.next) {
@@ -517,6 +531,7 @@ class Dashboard extends ChangeNotifier {
         }
       }
     }
+
     notifyListeners();
   }
 
