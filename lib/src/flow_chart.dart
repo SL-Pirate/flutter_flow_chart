@@ -123,6 +123,8 @@ class FlowChart extends StatefulWidget {
 
   final void Function(double scale)? onScaleUpdate;
 
+  final void Function(BuildContext context, Offset position)? onDashboardMoved;
+
   const FlowChart({
     super.key,
     this.onElementPressed,
@@ -147,6 +149,7 @@ class FlowChart extends StatefulWidget {
     this.onScaleUpdate,
     this.onNewConnection,
     required this.dashboard,
+    this.onDashboardMoved,
   });
 
   @override
@@ -267,6 +270,8 @@ class _FlowChartState extends State<FlowChart> {
 
                     widget.dashboard.gridBackgroundParams.offset =
                         details.focalPointDelta;
+                    widget.onDashboardMoved
+                        ?.call(context, details.focalPointDelta);
                     setState(() {});
                   },
                   onScaleEnd: (details) {

@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:flutter_flow_chart/src/elements/connection_params.dart';
+import 'package:uuid/uuid.dart';
 
 enum ElementKind {
   rectangle,
@@ -205,7 +206,6 @@ class FlowElement extends ChangeNotifier {
   /// Change element position in the dashboard
   changePosition(Offset newPosition) {
     position = newPosition;
-    notifyListeners();
   }
 
   /// Change element size
