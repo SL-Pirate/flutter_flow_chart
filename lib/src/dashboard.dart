@@ -47,11 +47,12 @@ class Dashboard extends ChangeNotifier {
     this.minimumZoomFactor = 0.25,
     this.defaultArrowStyle = ArrowStyle.curve,
     ArrowParams? defaultArrowParams,
+    GridBackgroundParams? gridBackgroundParams,
   })  : elements = [],
         defaultArrowParams = defaultArrowParams ?? ArrowParams(),
         _dashboardPosition = Offset.zero,
         dashboardSize = const Size(0, 0),
-        gridBackgroundParams = GridBackgroundParams() {
+        gridBackgroundParams = gridBackgroundParams ?? GridBackgroundParams() {
     // This is a workaround to set the handlerFeedbackOffset
     // to improve the user experience on devices with touch screens
     // This will prevent the handler being covered by user's finger
